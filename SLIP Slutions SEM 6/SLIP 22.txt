@@ -1,0 +1,289 @@
+📚 Q.1 Advanced Java:
+✅ A) Java Program to Display Date and Time of Server on Client Machine
+Server.java
+java
+Copy
+Edit
+import java.io.*;
+import java.net.*;
+import java.util.Date;
+
+public class Server {
+    public static void main(String[] args) {
+        try {
+            // Start the server on port 5000
+            ServerSocket serverSocket = new ServerSocket(5000);
+            System.out.println("Server is running... Waiting for client...");
+
+            // Accept client connection
+            Socket socket = serverSocket.accept();
+            System.out.println("Client connected!");
+
+            // Send current date and time to the client
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            Date currentDate = new Date();
+            out.println("Current Date and Time: " + currentDate);
+
+            // Close connection
+            out.close();
+            socket.close();
+            serverSocket.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+Client.java
+java
+Copy
+Edit
+import java.io.*;
+import java.net.*;
+
+public class Client {
+    public static void main(String[] args) {
+        try {
+            // Connect to server on localhost and port 5000
+            Socket socket = new Socket("localhost", 5000);
+
+            // Receive and display the date and time from server
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String serverResponse = in.readLine();
+            System.out.println(serverResponse);
+
+            // Close connection
+            in.close();
+            socket.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+✅ Run Instructions:
+Compile both files:
+
+bash
+Copy
+Edit
+javac Server.java
+javac Client.java
+Run the server first:
+
+bash
+Copy
+Edit
+java Server
+Run the client:
+
+bash
+Copy
+Edit
+java Client
+✅ B) JSP Program to Accept and Store Account Details in Database and Display in Tabular Form
+Database Schema:
+Database Name: bankdb
+
+Table Name: accounts
+
+Columns:
+
+ANo (INT)
+
+Type (VARCHAR)
+
+Bal (DOUBLE)
+
+account_form.html
+html
+Copy
+Edit
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Account Form</title>
+</head>
+<body>
+    <h2>Enter Account Details</h2>
+    <form action="account.jsp" method="post">
+        Account No: <input type="text" name="ano" required><br><br>
+        Account Type: <input type="text" name="type" required><br><br>
+        Balance: <input type="text" name="bal" required><br><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
+account.jsp
+jsp
+Copy
+Edit
+<%@ page import="java.sql.*" %>
+<%
+    // Get form data
+    int ano = Integer.parseInt(request.getParameter("ano"));
+    String type = request.getParameter("type");
+    double bal = Double.parseDouble(request.getParameter("bal"));
+
+    // Database connection details
+    String url = "jdbc:mysql://localhost:3306/bankdb";
+    String user = "root";
+    String password = "root"; // Change as per your configuration
+
+    Connection conn = null;
+    PreparedStatement pstmt = null;
+
+    try {
+        // Load MySQL driver
+        Class.forName("com.mysql.cj.jdbc.Driver");
+
+        // Establish connection
+        conn = DriverManager.getConnection(url, user, password);
+
+        // Insert data
+        String insertQuery = "INSERT INTO accounts (ANo, Type, Bal) VALUES (?, ?, ?)";
+        pstmt = conn.prepareStatement(insertQuery);
+        pstmt.setInt(1, ano);
+        pstmt.setString(2, type);
+        pstmt.setDouble(3, bal);
+        pstmt.executeUpdate();
+
+        out.println("<h3>Data inserted successfully!</h3>");
+
+        // Display data in tabular format
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery("SELECT * FROM accounts");
+
+        out.println("<h2>Account Details:</h2>");
+        out.println("<table border='1'><tr><th>Account No</th><th>Type</th><th>Balance</th></tr>");
+
+        while (rs.next()) {
+            out.println("<tr><td>" + rs.getInt("ANo") + "</td><td>" +
+                        rs.getString("Type") + "</td><td>" +
+                        rs.getDouble("Bal") + "</td></tr>");
+        }
+        out.println("</table>");
+
+    } catch (Exception e) {
+        out.println(e);
+    } finally {
+        if (pstmt != null) pstmt.close();
+        if (conn != null) conn.close();
+    }
+%>
+✅ Run Instructions:
+Place account_form.html and account.jsp in the webapps directory of Tomcat.
+
+Access http://localhost:8080/your_project/account_form.html to enter account details.
+
+📱 Q.2 Android:
+✅ A) Android Application to Show Greeting Information to User
+MainActivity.java
+java
+Copy
+Edit
+package com.example.greetingapp;
+
+import android.os.Bundle;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+    TextView greetingText;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        greetingText = findViewById(R.id.greetingText);
+
+        // Set greeting message
+        String message = "Hello, Welcome to Our Application!";
+        greetingText.setText(message);
+    }
+}
+activity_main.xml
+xml
+Copy
+Edit
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/greetingText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="#000"
+        android:text="Welcome!"
+        android:layout_centerInParent="true" />
+</RelativeLayout>
+✅ Run Instructions:
+Load the project in Android Studio.
+
+Run the app to display the greeting.
+
+✅ B) Android Application Demonstrating GridView and Display Toast on Item Click
+MainActivity.java
+java
+Copy
+Edit
+package com.example.gridviewapp;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.GridView;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+    GridView gridView;
+    String[] items = {"Apple", "Banana", "Cherry", "Dates", "Grapes", "Mango", "Orange", "Pineapple"};
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        gridView = findViewById(R.id.gridView);
+
+        // Create ArrayAdapter for GridView
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
+        gridView.setAdapter(adapter);
+
+        // On item click listener
+        gridView.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedItem = items[position];
+            Toast.makeText(getApplicationContext(), "Clicked: " + selectedItem, Toast.LENGTH_SHORT).show();
+        });
+    }
+}
+activity_main.xml
+xml
+Copy
+Edit
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <GridView
+        android:id="@+id/gridView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:numColumns="2"
+        android:horizontalSpacing="10dp"
+        android:verticalSpacing="10dp"
+        android:gravity="center"
+        android:stretchMode="columnWidth" />
+</RelativeLayout>
+✅ Run Instructions:
+Load the project in Android Studio.
+
+Run the app to display a grid of items.
+
+Click on any item to display a Toast message.
+

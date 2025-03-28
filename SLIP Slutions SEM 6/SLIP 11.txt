@@ -1,0 +1,259 @@
+Q.1 Advanced Java:
+✅ A) Java Program to Display IP Address and Name of Client Machine
+ClientInfo.java
+
+import java.net.*;
+
+public class ClientInfo {
+    public static void main(String[] args) {
+        try {
+            // Get IP address of the local host
+            InetAddress localHost = InetAddress.getLocalHost();
+            
+            // Display host name and IP address
+            System.out.println("Host Name: " + localHost.getHostName());
+            System.out.println("IP Address: " + localHost.getHostAddress());
+        } catch (UnknownHostException e) {
+            System.out.println("Unable to retrieve IP address and host name.");
+            e.printStackTrace();
+        }
+    }
+}
+
+✅ Run Instructions:
+Save as ClientInfo.java.
+
+Compile and run:
+
+javac ClientInfo.java
+java ClientInfo
+
+✅ B) Java Program to Display Sales Details of Product Between Two Selected Dates
+Database Schema:
+Database Name: salesdb
+
+Table Name: sales
+
+Columns:
+
+PID (INT)
+
+PName (VARCHAR)
+
+Qty (INT)
+
+Rate (FLOAT)
+
+Amount (FLOAT)
+
+SaleDate (DATE)
+
+SalesDetails.java
+java
+Copy
+Edit
+import java.sql.*;
+import java.util.Scanner;
+
+public class SalesDetails {
+    public static void main(String[] args) {
+        String url = "jdbc:mysql://localhost:3306/salesdb";
+        String user = "root";
+        String password = "root"; // Change as per your MySQL password
+
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            // Get dates from the user
+            System.out.print("Enter start date (YYYY-MM-DD): ");
+            String startDate = scanner.nextLine();
+
+            System.out.print("Enter end date (YYYY-MM-DD): ");
+            String endDate = scanner.nextLine();
+
+            // Establish connection to database
+            Connection conn = DriverManager.getConnection(url, user, password);
+
+            // SQL query to fetch data between two dates
+            String query = "SELECT PID, PName, Qty, Rate, Amount, SaleDate FROM sales WHERE SaleDate BETWEEN ? AND ?";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, startDate);
+            pstmt.setString(2, endDate);
+
+            // Execute query
+            ResultSet rs = pstmt.executeQuery();
+
+            // Display results
+            System.out.println("Sales Details Between " + startDate + " and " + endDate);
+            System.out.println("PID\tPName\tQty\tRate\tAmount\tSaleDate");
+            while (rs.next()) {
+                System.out.println(
+                    rs.getInt("PID") + "\t" +
+                    rs.getString("PName") + "\t" +
+                    rs.getInt("Qty") + "\t" +
+                    rs.getFloat("Rate") + "\t" +
+                    rs.getFloat("Amount") + "\t" +
+                    rs.getDate("SaleDate")
+                );
+            }
+
+            // Close connection
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            scanner.close();
+        }
+    }
+}
+✅ Run Instructions:
+Save as SalesDetails.java.
+
+Compile and run:
+
+bash
+Copy
+Edit
+javac SalesDetails.java
+java -cp .;mysql-connector-java-8.0.33.jar SalesDetails
+📱 Q.2 Android:
+✅ A) Android Application to Demonstrate Radio Button
+MainActivity.java
+java
+Copy
+Edit
+package com.example.radiobuttonapp;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+    RadioGroup radioGroup;
+    RadioButton selectedRadioButton;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        radioGroup = findViewById(R.id.radioGroup);
+    }
+
+    public void onRadioButtonClick(View view) {
+        int selectedId = radioGroup.getCheckedRadioButtonId();
+        selectedRadioButton = findViewById(selectedId);
+
+        if (selectedRadioButton != null) {
+            String selectedText = selectedRadioButton.getText().toString();
+            Toast.makeText(this, "Selected: " + selectedText, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Please select an option", Toast.LENGTH_SHORT).show();
+        }
+    }
+}
+activity_main.xml
+xml
+Copy
+Edit
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerInParent="true">
+
+        <RadioButton
+            android:id="@+id/radioOption1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Option 1"/>
+
+        <RadioButton
+            android:id="@+id/radioOption2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Option 2"/>
+
+        <RadioButton
+            android:id="@+id/radioOption3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Option 3"/>
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/submitBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Submit"
+        android:onClick="onRadioButtonClick"
+        android:layout_below="@id/radioGroup"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"/>
+</RelativeLayout>
+✅ B) Android Application to Demonstrate ListView and Display Toast on Click
+MainActivity.java
+java
+Copy
+Edit
+package com.example.listviewapp;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+    ListView listView;
+    String[] friendsList = {"Amit", "Rahul", "Neha", "Pooja", "Arjun"};
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        listView = findViewById(R.id.listView);
+
+        // Set adapter to populate the list
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, friendsList);
+        listView.setAdapter(adapter);
+
+        // Set onClick listener
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedFriend = friendsList[position];
+            Toast.makeText(getApplicationContext(), "You clicked: " + selectedFriend, Toast.LENGTH_SHORT).show();
+        });
+    }
+}
+activity_main.xml
+xml
+Copy
+Edit
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"
+        android:layout_marginTop="20dp"
+        android:layout_centerInParent="true"/>
+</RelativeLayout>

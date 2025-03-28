@@ -1,0 +1,373 @@
+📚 Q.1 Advanced Java:
+✅ A) Java Program to Display College Details on JTable
+CollegeDetails.java
+java
+Copy
+Edit
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.sql.*;
+
+public class CollegeDetails {
+    public static void main(String[] args) {
+        // JFrame to hold the table
+        JFrame frame = new JFrame("College Details");
+
+        // Column names for JTable
+        String[] columnNames = {"CID", "CName", "Address", "Year"};
+
+        // Create DefaultTableModel
+        DefaultTableModel model = new DefaultTableModel();
+        model.setColumnIdentifiers(columnNames);
+
+        // JTable to display data
+        JTable table = new JTable(model);
+        JScrollPane scrollPane = new JScrollPane(table);
+        frame.add(scrollPane);
+
+        try {
+            // Database connection details
+            String url = "jdbc:mysql://localhost:3306/collegedb";
+            String user = "root";
+            String password = "root"; // Change as per your configuration
+
+            // Load MySQL driver and establish connection
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection conn = DriverManager.getConnection(url, user, password);
+
+            // SQL query to fetch data
+            String query = "SELECT * FROM College";
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+
+            // Add rows to table model
+            while (rs.next()) {
+                int cid = rs.getInt("CID");
+                String cname = rs.getString("CName");
+                String address = rs.getString("Address");
+                int year = rs.getInt("Year");
+
+                model.addRow(new Object[]{cid, cname, address, year});
+            }
+
+            // Close connection
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Frame settings
+        frame.setSize(500, 300);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+}
+✅ Run Instructions:
+Create a MySQL Database:
+
+sql
+Copy
+Edit
+CREATE DATABASE collegedb;
+USE collegedb;
+
+CREATE TABLE College (
+    CID INT PRIMARY KEY,
+    CName VARCHAR(100),
+    Address VARCHAR(100),
+    Year INT
+);
+
+INSERT INTO College VALUES (1, 'ABC College', 'Delhi', 1990);
+INSERT INTO College VALUES (2, 'XYZ Institute', 'Mumbai', 2005);
+INSERT INTO College VALUES (3, 'LMN University', 'Bangalore', 2010);
+Compile and Run the Code:
+
+bash
+Copy
+Edit
+javac CollegeDetails.java
+java CollegeDetails
+✅ B) Servlet Application to Validate Username and Password from Database
+Database Setup:
+Database Name: userdb
+
+Table Name: users
+
+Columns:
+
+username (VARCHAR)
+
+password (VARCHAR)
+
+sql
+Copy
+Edit
+CREATE DATABASE userdb;
+USE userdb;
+
+CREATE TABLE users (
+    username VARCHAR(50),
+    password VARCHAR(50)
+);
+
+INSERT INTO users VALUES ('admin', 'admin123');
+INSERT INTO users VALUES ('user1', 'pass1');
+index.html
+html
+Copy
+Edit
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Page</title>
+</head>
+<body>
+    <h2>Login Form</h2>
+    <form action="LoginServlet" method="post">
+        Username: <input type="text" name="username" required><br><br>
+        Password: <input type="password" name="password" required><br><br>
+        <input type="submit" value="Login">
+    </form>
+</body>
+</html>
+LoginServlet.java
+java
+Copy
+Edit
+import java.io.*;
+import java.sql.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+
+public class LoginServlet extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        // Get form data
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+
+        // Database connection details
+        String url = "jdbc:mysql://localhost:3306/userdb";
+        String user = "root";
+        String dbPassword = "root"; // Change as per your configuration
+
+        try {
+            // Load MySQL driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Connect to database
+            Connection conn = DriverManager.getConnection(url, user, dbPassword);
+
+            // Check credentials in database
+            String query = "SELECT * FROM users WHERE username = ? AND password = ?";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                out.println("<h3>Login Successfully!</h3>");
+            } else {
+                out.println("<h3>Login Failed! Invalid username or password.</h3>");
+            }
+
+            // Close connection
+            rs.close();
+            pstmt.close();
+            conn.close();
+        } catch (Exception e) {
+            out.println(e);
+        }
+    }
+}
+✅ Run Instructions:
+Place index.html and LoginServlet.java in webapps directory of Tomcat.
+
+Compile LoginServlet.java:
+
+bash
+Copy
+Edit
+javac LoginServlet.java
+Deploy WAR or run from localhost:8080/your_project/index.html.
+
+📱 Q.2 Android:
+✅ A) Android Program to Demonstrate Date Picker Dialog on EditText Click
+MainActivity.java
+java
+Copy
+Edit
+package com.example.datepickerapp;
+
+import android.app.DatePickerDialog;
+import android.os.Bundle;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import androidx.appcompat.app.AppCompatActivity;
+import java.util.Calendar;
+
+public class MainActivity extends AppCompatActivity {
+    EditText dateInput;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        dateInput = findViewById(R.id.dateInput);
+
+        // Show DatePicker when EditText is clicked
+        dateInput.setOnClickListener(v -> {
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            // Date Picker Dialog
+            DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.this,
+                    (view, year1, monthOfYear, dayOfMonth) -> {
+                        String date = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year1;
+                        dateInput.setText(date);
+                    }, year, month, day);
+            datePickerDialog.show();
+        });
+    }
+}
+activity_main.xml
+xml
+Copy
+Edit
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/dateInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Select Date"
+        android:focusable="false"
+        android:layout_centerInParent="true" />
+</RelativeLayout>
+✅ Run Instructions:
+Load the project in Android Studio.
+
+Run the app to display Date Picker when clicking the EditText.
+
+✅ B) Android Application to Demonstrate Custom ListView with Book Name and Author
+MainActivity.java
+java
+Copy
+Edit
+package com.example.booklistapp;
+
+import android.os.Bundle;
+import android.widget.ListView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+    ListView listView;
+    String[] bookNames = {"Harry Potter", "Rich Dad Poor Dad", "The Alchemist", "Atomic Habits", "Java Programming"};
+    String[] authors = {"J.K. Rowling", "Robert Kiyosaki", "Paulo Coelho", "James Clear", "Herbert Schildt"};
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        listView = findViewById(R.id.listView);
+
+        // Create custom adapter
+        BookAdapter adapter = new BookAdapter(this, bookNames, authors);
+        listView.setAdapter(adapter);
+    }
+}
+BookAdapter.java
+java
+Copy
+Edit
+package com.example.booklistapp;
+
+import android.app.Activity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;
+
+public class BookAdapter extends ArrayAdapter<String> {
+    private final Activity context;
+    private final String[] bookNames;
+    private final String[] authors;
+
+    public BookAdapter(Activity context, String[] bookNames, String[] authors) {
+        super(context, R.layout.list_item, bookNames);
+        this.context = context;
+        this.bookNames = bookNames;
+        this.authors = authors;
+    }
+
+    @Override
+    public View getView(int position, View view, ViewGroup parent) {
+        LayoutInflater inflater = context.getLayoutInflater();
+        View rowView = inflater.inflate(R.layout.list_item, null, true);
+
+        TextView bookNameText = rowView.findViewById(R.id.bookName);
+        TextView authorText = rowView.findViewById(R.id.authorName);
+
+        bookNameText.setText(bookNames[position]);
+        authorText.setText(authors[position]);
+
+        return rowView;
+    }
+}
+activity_main.xml
+xml
+Copy
+Edit
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</RelativeLayout>
+list_item.xml
+xml
+Copy
+Edit
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/bookName"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/authorName"
+        android:textSize="14sp"
+        android:textColor="#555"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>
+✅ Run Instructions:
+Load the project in Android Studio.
+
+Run the app to display a list of books and authors.
+
